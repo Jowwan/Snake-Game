@@ -18,7 +18,7 @@ A classic Snake game built with **Pygame**, featuring score tracking and a round
 1. Make sure you have **Python 3** and **Pygame** installed:
 
    ```bash
-   pip install pygame
+   pip install pygame-ce
    ```
 2. Run the game:
 
