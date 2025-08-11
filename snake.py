@@ -144,13 +144,10 @@ def main():
                 else:
                     snake.pop()
 
-        # ---------- Drawing ----------
         screen.fill(BORDER_COLOR)
 
-        # HUD background
         pygame.draw.rect(screen, HUD_BG, (0, 0, WINDOW_WIDTH, HUD_HEIGHT))
 
-        # Draw HUD info
         elapsed_time = int(
             time.time() - start_time) if not game_over else int(start_time - start_time)
         score_surf = font.render(f"Score: {score}", True, BLACK)
@@ -158,11 +155,9 @@ def main():
         screen.blit(score_surf, (30, 30))
         screen.blit(time_surf, (WINDOW_WIDTH - time_surf.get_width() - 30, 30))
 
-        # Draw game background
         pygame.draw.rect(screen, BLACK, (BORDER, HUD_HEIGHT +
                          BORDER, GAME_WIDTH, GAME_HEIGHT))
 
-        # Grid lines inside game area
         for x in range(GRID_WIDTH):
             pygame.draw.line(screen, GRAY,
                              (BORDER + x * CELL_SIZE, HUD_HEIGHT + BORDER),
@@ -172,10 +167,9 @@ def main():
                              (BORDER, HUD_HEIGHT + BORDER + y * CELL_SIZE),
                              (BORDER + GAME_WIDTH, HUD_HEIGHT + BORDER + y * CELL_SIZE))
 
-        # Food
         if food:
             draw_rect(screen, RED, food)
-        # Snake
+
         if snake:
             draw_rect(screen, DARK_GREEN, snake[0])
             for seg in snake[1:]:
