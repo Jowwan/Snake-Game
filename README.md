@@ -10,7 +10,7 @@ A classic Snake game built with **Pygame**, featuring score tracking and a round
 
 ## Controls
 
-* **Arrow Keys** – Move the snake.
+* **Arrow Keys** or **WASD** – Move the snake.
 * **ESC** – Quit the game.
 
 ## How to Run
