@@ -28,7 +28,6 @@ HUD_BG = (230, 230, 230)
 
 # ---------- Utilities ----------
 
-
 def random_food_position(snake):
     positions = [(x, y) for x in range(GRID_WIDTH) for y in range(GRID_HEIGHT)]
     available = list(set(positions) - set(snake))
@@ -46,13 +45,11 @@ def draw_rect(surface, color, pos):
 
 # ---------- Game ----------
 
-
 def main():
     pygame.init()
-    screen = pygame.display.set_mode(
-        (WINDOW_WIDTH, WINDOW_HEIGHT))
-
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Snake")
+
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("consolas", 20)
     big_font = pygame.font.SysFont("consolas", 48)
@@ -60,8 +57,11 @@ def main():
     def reset_game():
         start_x = GRID_WIDTH // 2
         start_y = GRID_HEIGHT // 2
-        snake = [(start_x, start_y), (start_x - 1, start_y),
-                 (start_x - 2, start_y)]
+        snake = [
+            (start_x, start_y),
+            (start_x - 1, start_y),
+            (start_x - 2, start_y)
+        ]
         direction = (1, 0)
         food = random_food_position(snake)
         score = 0
@@ -72,17 +72,21 @@ def main():
         waiting = True
         while waiting:
             screen.fill(BLACK)
+
             title_text = big_font.render("SNAKE GAME", True, WHITE)
             title_rect = title_text.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 40))
+                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 40)
+            )
             screen.blit(title_text, title_rect)
 
             start_text = font.render("Press any key to start", True, WHITE)
             start_rect = start_text.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 20))
+                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 20)
+            )
             screen.blit(start_text, start_rect)
 
             pygame.display.flip()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -98,44 +102,59 @@ def main():
     game_over = False
 
     while running:
+        direction_changed = False 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 break
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     break
+
                 if event.key == pygame.K_p:
                     paused = not paused
-                if not game_over and not paused:
-                    if event.key in (pygame.K_UP, pygame.K_w) and direction != (0, 1):
-                        direction = (0, -1)
-                    elif event.key in (pygame.K_DOWN, pygame.K_s) and direction != (0, -1):
-                        direction = (0, 1)
-                    elif event.key in (pygame.K_LEFT, pygame.K_a) and direction != (1, 0):
-                        direction = (-1, 0)
-                    elif event.key in (pygame.K_RIGHT, pygame.K_d) and direction != (-1, 0):
-                        direction = (1, 0)
+
                 if game_over and event.key == pygame.K_r:
                     snake, direction, food, score, start_time = reset_game()
                     game_over = False
                     paused = False
 
+                # ---------- SAFE DIRECTION HANDLING ----------
+                if not game_over and not paused and not direction_changed:
+                    if event.key in (pygame.K_UP, pygame.K_w) and direction != (0, 1):
+                        direction = (0, -1)
+                        direction_changed = True
+                    elif event.key in (pygame.K_DOWN, pygame.K_s) and direction != (0, -1):
+                        direction = (0, 1)
+                        direction_changed = True
+                    elif event.key in (pygame.K_LEFT, pygame.K_a) and direction != (1, 0):
+                        direction = (-1, 0)
+                        direction_changed = True
+                    elif event.key in (pygame.K_RIGHT, pygame.K_d) and direction != (-1, 0):
+                        direction = (1, 0)
+                        direction_changed = True
+
         if not running:
             break
 
+        # ---------- GAME LOGIC ----------
         if not paused and not game_over:
             head_x, head_y = snake[0]
             dx, dy = direction
             new_head = (head_x + dx, head_y + dy)
 
-            if (new_head[0] < 0 or new_head[0] >= GRID_WIDTH or
+            if (
+                new_head[0] < 0 or new_head[0] >= GRID_WIDTH or
                 new_head[1] < 0 or new_head[1] >= GRID_HEIGHT or
-                    new_head in snake):
+                new_head in snake
+            ):
                 game_over = True
             else:
                 snake.insert(0, new_head)
+
                 if food and new_head == food:
                     score += 1
                     food = random_food_position(snake)
@@ -144,28 +163,36 @@ def main():
                 else:
                     snake.pop()
 
+        # ---------- DRAW ----------
         screen.fill(BORDER_COLOR)
-
         pygame.draw.rect(screen, HUD_BG, (0, 0, WINDOW_WIDTH, HUD_HEIGHT))
 
-        elapsed_time = int(
-            time.time() - start_time) if not game_over else int(start_time - start_time)
+        elapsed_time = int(time.time() - start_time) if not game_over else 0
         score_surf = font.render(f"Score: {score}", True, BLACK)
         time_surf = font.render(f"Time: {elapsed_time}s", True, BLACK)
+
         screen.blit(score_surf, (30, 30))
         screen.blit(time_surf, (WINDOW_WIDTH - time_surf.get_width() - 30, 30))
 
-        pygame.draw.rect(screen, BLACK, (BORDER, HUD_HEIGHT +
-                         BORDER, GAME_WIDTH, GAME_HEIGHT))
+        pygame.draw.rect(
+            screen,
+            BLACK,
+            (BORDER, HUD_HEIGHT + BORDER, GAME_WIDTH, GAME_HEIGHT)
+        )
 
         for x in range(GRID_WIDTH):
-            pygame.draw.line(screen, GRAY,
-                             (BORDER + x * CELL_SIZE, HUD_HEIGHT + BORDER),
-                             (BORDER + x * CELL_SIZE, HUD_HEIGHT + BORDER + GAME_HEIGHT))
+            pygame.draw.line(
+                screen, GRAY,
+                (BORDER + x * CELL_SIZE, HUD_HEIGHT + BORDER),
+                (BORDER + x * CELL_SIZE, HUD_HEIGHT + BORDER + GAME_HEIGHT)
+            )
+
         for y in range(GRID_HEIGHT):
-            pygame.draw.line(screen, GRAY,
-                             (BORDER, HUD_HEIGHT + BORDER + y * CELL_SIZE),
-                             (BORDER + GAME_WIDTH, HUD_HEIGHT + BORDER + y * CELL_SIZE))
+            pygame.draw.line(
+                screen, GRAY,
+                (BORDER, HUD_HEIGHT + BORDER + y * CELL_SIZE),
+                (BORDER + GAME_WIDTH, HUD_HEIGHT + BORDER + y * CELL_SIZE)
+            )
 
         if food:
             draw_rect(screen, RED, food)
@@ -175,21 +202,28 @@ def main():
             for seg in snake[1:]:
                 draw_rect(screen, GREEN, seg)
 
-        # Messages
+        # ---------- MESSAGES ----------
         if paused:
             pause_surf = big_font.render("PAUSED", True, WHITE)
-            rect = pause_surf.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-            screen.blit(pause_surf, rect)
+            screen.blit(
+                pause_surf,
+                pause_surf.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+            )
+
         if game_over:
             over_surf = big_font.render("GAME OVER", True, WHITE)
             rect = over_surf.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 20))
+                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 20)
+            )
             screen.blit(over_surf, rect)
+
             hint = font.render(
-                "Press R to restart or ESC to quit", True, WHITE)
+                "Press R to restart or ESC to quit", True, WHITE
+            )
             screen.blit(
-                hint, (rect.centerx - hint.get_width() // 2, rect.bottom + 8))
+                hint,
+                (rect.centerx - hint.get_width() // 2, rect.bottom + 8)
+            )
 
         pygame.display.flip()
         clock.tick(FPS)
