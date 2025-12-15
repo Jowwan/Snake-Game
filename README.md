@@ -2,11 +2,15 @@
 
 A classic Snake game built with **Pygame**, featuring score tracking and a round timer.
 
+---
+
 ## ✨ Features
 
 - 🟢 **Score Keeping** – Tracks how many food items you collect.
 - ⏱ **Round Timer** – See how long you last each game.
 - 🎮 Simple and fun.
+
+---
 
 ## 🧩 Installation
 
